@@ -1,0 +1,166 @@
+/* ── Reset ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #0e7490;
+  --primary-dark: #155e75;
+  --accent: #eab308;
+  --bg: #f0f9ff;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --text-sec: #64748b;
+  --error: #ef4444;
+  --success: #22c55e;
+  --radius: 16px;
+  --radius-sm: 8px;
+}
+
+html, body, #root {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Login ─────────────────────────────────────────────────── */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px;
+}
+.login-card {
+  max-width: 400px;
+  width: 100%;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 24px rgba(0,0,0,.08);
+  padding: 40px 32px;
+  text-align: center;
+}
+.login-card img {
+  width: 120px; height: auto;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.login-card h1 {
+  font-size: 1.5rem; color: var(--primary);
+  margin-bottom: 6px;
+}
+.login-card .sub {
+  color: var(--text-sec); margin-bottom: 24px;
+  font-size: .9rem;
+}
+.login-card input {
+  width: 100%; padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  font-size: 1rem; outline: none;
+  margin-bottom: 14px;
+  transition: border-color .2s;
+}
+.login-card input:focus { border-color: var(--primary); }
+.login-card .err { color: var(--error); font-size: .85rem; margin-bottom: 10px; }
+
+/* ── Dashboard ─────────────────────────────────────────────── */
+.dash {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+.dash-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap; gap: 12px;
+}
+.dash-header h1 {
+  font-size: 1.35rem; color: var(--primary);
+}
+.dash-header .right {
+  display: flex; align-items: center; gap: 12px;
+}
+.dash-header .count {
+  font-size: .85rem; color: var(--text-sec);
+}
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.grid {
+  display: grid; gap: 20px;
+}
+@media (min-width: 640px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  transition: box-shadow .2s;
+}
+.card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+.card video {
+  width: 100%; aspect-ratio: 16/9;
+  background: #000; display: block;
+}
+.card-info {
+  padding: 14px 16px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+}
+.card-meta {
+  display: flex; gap: 14px;
+  font-size: .83rem; color: var(--text-sec);
+  flex-wrap: wrap;
+}
+.card-meta .platform {
+  background: #e0f2fe; padding: 2px 8px;
+  border-radius: 4px; font-size: .75rem; font-weight: 600;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  background: var(--primary); color: #fff; border: none;
+  padding: 12px 32px; border-radius: var(--radius-sm);
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  transition: background .2s; width: 100%;
+}
+.btn:hover { background: var(--primary-dark); }
+.btn-sm {
+  background: none; border: 1px solid var(--error);
+  color: var(--error); padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  font-size: .78rem; font-weight: 600; cursor: pointer;
+  transition: all .2s;
+}
+.btn-sm:hover { background: var(--error); color: #fff; }
+.btn-logout {
+  background: none; border: 1px solid var(--error);
+  color: var(--error); padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  font-size: .82rem; font-weight: 600; cursor: pointer;
+  transition: all .2s;
+}
+.btn-logout:hover { background: var(--error); color: #fff; }
+
+/* ── Empty ──────────────────────────────────────────────────── */
+.empty {
+  text-align: center; padding: 48px 24px;
+  color: var(--text-sec);
+}
+.empty p { margin-bottom: 8px; }
+
+/* ── Spinner ──────────────────────────────────────────────── */
+.spinner {
+  width: 24px; height: 24px;
+  border: 3px solid var(--primary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading { text-align: center; padding: 48px; }
