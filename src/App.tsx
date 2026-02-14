@@ -73,11 +73,13 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
-async function base64ToBlobUrl(b64: string, mime = "video/webm"): Promise<string | null> {
+/** Decode base64 to Blob without data URL (avoids 2MB+ URL limit in Chrome) */
+function base64ToBlobUrl(b64: string, mime = "video/webm"): string | null {
   try {
-    const dataUrl = `data:${mime};base64,${b64}`;
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: mime });
     return URL.createObjectURL(blob);
   } catch {
     return null;
@@ -126,7 +128,7 @@ export default function App() {
         if (rec.blob instanceof Blob) {
           urls[rec.id] = URL.createObjectURL(rec.blob);
         } else if (rec.blob_data) {
-          const url = await base64ToBlobUrl(rec.blob_data);
+          const url = base64ToBlobUrl(rec.blob_data);
           if (url) urls[rec.id] = url;
         } else if (rec.public_url) {
           urls[rec.id] = rec.public_url;
