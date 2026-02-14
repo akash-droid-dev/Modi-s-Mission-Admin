@@ -72,6 +72,17 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
+async function base64ToBlobUrl(b64: string, mime = "video/webm"): Promise<string | null> {
+  try {
+    const dataUrl = `data:${mime};base64,${b64}`;
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState("");
@@ -100,23 +111,26 @@ export default function App() {
   // ── Fetch recordings ─────────────────────────────────────
   const fetchRecordings = useCallback(async () => {
     setLoading(true);
+    setBlobUrls((prev) => {
+      Object.values(prev).forEach((u) => URL.revokeObjectURL(u));
+      return {};
+    });
     try {
       const recs = await getAllFromDB();
       setRecordings(recs);
 
-      // Create blob URLs for playback
+      // Create blob URLs for playback (fetch-based for large videos)
       const urls: Record<string, string> = {};
-      for (const rec of recs) {
-        if (rec.blob_data) {
-          const binary = atob(rec.blob_data);
-          const bytes = new Uint8Array(binary.length);
-          for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-          const blob = new Blob([bytes], { type: "video/webm" });
-          urls[rec.id] = URL.createObjectURL(blob);
-        } else if (rec.public_url) {
-          urls[rec.id] = rec.public_url;
-        }
-      }
+      await Promise.all(
+        recs.map(async (rec) => {
+          if (rec.blob_data) {
+            const url = await base64ToBlobUrl(rec.blob_data);
+            if (url) urls[rec.id] = url;
+          } else if (rec.public_url) {
+            urls[rec.id] = rec.public_url;
+          }
+        })
+      );
       setBlobUrls(urls);
     } catch (err) {
       console.error("Failed to load recordings:", err);
