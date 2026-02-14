@@ -122,17 +122,22 @@ export default function App() {
       const recs = await getAllFromDB();
       setRecordings(recs);
 
-      // Create blob URLs for playback
+      // Create blob URLs for playback (try blob first, fallback to base64)
       const urls: Record<string, string> = {};
       for (const rec of recs) {
-        if (rec.blob instanceof Blob) {
-          urls[rec.id] = URL.createObjectURL(rec.blob);
-        } else if (rec.blob_data) {
-          const url = base64ToBlobUrl(rec.blob_data);
-          if (url) urls[rec.id] = url;
-        } else if (rec.public_url) {
-          urls[rec.id] = rec.public_url;
+        let url: string | null = null;
+        try {
+          if (rec.blob instanceof Blob) {
+            url = URL.createObjectURL(rec.blob);
+          }
+        } catch {}
+        if (!url && rec.blob_data) {
+          url = base64ToBlobUrl(rec.blob_data);
         }
+        if (!url && rec.public_url) {
+          url = rec.public_url;
+        }
+        if (url) urls[rec.id] = url;
       }
       setBlobUrls(urls);
     } catch (err) {
