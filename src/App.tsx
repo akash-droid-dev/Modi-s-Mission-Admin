@@ -10,7 +10,8 @@ interface Recording {
   size: number;
   platform: string;
   public_url: string;
-  blob_data?: string; // base64 for demo
+  blob?: Blob;       // direct Blob (preferred)
+  blob_data?: string; // base64 (legacy)
 }
 
 // ── IndexedDB helpers (shared storage for github.io origin) ──
@@ -119,18 +120,18 @@ export default function App() {
       const recs = await getAllFromDB();
       setRecordings(recs);
 
-      // Create blob URLs for playback (fetch-based for large videos)
+      // Create blob URLs for playback
       const urls: Record<string, string> = {};
-      await Promise.all(
-        recs.map(async (rec) => {
-          if (rec.blob_data) {
-            const url = await base64ToBlobUrl(rec.blob_data);
-            if (url) urls[rec.id] = url;
-          } else if (rec.public_url) {
-            urls[rec.id] = rec.public_url;
-          }
-        })
-      );
+      for (const rec of recs) {
+        if (rec.blob instanceof Blob) {
+          urls[rec.id] = URL.createObjectURL(rec.blob);
+        } else if (rec.blob_data) {
+          const url = await base64ToBlobUrl(rec.blob_data);
+          if (url) urls[rec.id] = url;
+        } else if (rec.public_url) {
+          urls[rec.id] = rec.public_url;
+        }
+      }
       setBlobUrls(urls);
     } catch (err) {
       console.error("Failed to load recordings:", err);
